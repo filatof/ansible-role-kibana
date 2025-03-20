@@ -6,13 +6,25 @@
       - gnupg2
     state: present
 
-- name: Add Elasticsearch apt key.
-  apt_key:
-    url: https://artifacts.elastic.co/GPG-KEY-elasticsearch
-    state: present
+#- name: Add Elasticsearch apt key.
+#  apt_key:
+#    url: https://artifacts.elastic.co/GPG-KEY-elasticsearch
+#    state: present
+#
+#- name: Add Kibana repository.
+#  apt_repository:
+#    repo: 'deb https://artifacts.elastic.co/packages/{{ kibana_version }}/apt stable main'
+#    state: present
+#    update_cache: true
 
-- name: Add Kibana repository.
-  apt_repository:
-    repo: 'deb https://artifacts.elastic.co/packages/{{ kibana_version }}/apt stable main'
-    state: present
-    update_cache: true
+- name: URL for download kibana from Yandex
+  set_fact:
+    es_major_version: "{{ es_version.split('.')[0] }}"
+    es_download_url: "https://mirror.yandex.ru/mirrors/elastic/{{ es_version.split('.')[0] }}/pool/main/k/kibana/kibana-{{ es_version }}-amd64.deb"
+    es_package_file: kibana-{{ es_version }}.deb
+
+- name: Download kibana package
+  get_url:
+    url: "{{ es_download_url }}"
+    dest: "/tmp/kibana-{{ es_version }}.deb"
+    mode: '0644'
